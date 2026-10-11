@@ -1,0 +1,2 @@
+"""Russian locale package init."""
+
