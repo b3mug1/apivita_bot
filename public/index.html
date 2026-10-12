@@ -133,6 +133,7 @@
     .product-detail-trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
     .product-detail-trigger:hover { color: var(--green); }
     .product-meta { color: #898b7d; font-size: 10px; }
+    .variant-select { width: 100%; min-height: 38px; margin-top: 12px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: var(--ink); font-size: 11px; cursor: pointer; }
     .product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 14px; }
     .product-price { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
     .add-button { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 50%; background: var(--green); color: white; cursor: pointer; font-size: 21px; line-height: 1; transition: transform .2s, background .2s; }
@@ -337,10 +338,10 @@
   </style>
 </head>
 <body>
-  <div class="announcement">🐝 <span>С любовью с пасеки —</span> <b>натуральный мёд Казахстана</b></div>
+  <div class="announcement" id="top">🐝 <span>С любовью с пасеки —</span> <b>натуральный мёд Казахстана</b></div>
   <header class="header">
     <div class="header-inner">
-      <a class="brand" href="#" aria-label="АпивитА — на главную"><span class="brand-mark">✳</span><span class="brand-name">Апивит<span>А</span></span></a>
+      <a class="brand" href="#top" aria-label="АпивитА — на главную"><span class="brand-mark">✳</span><span class="brand-name">Апивит<span>А</span></span></a>
       <nav class="nav" aria-label="Главная навигация">
         <a href="#catalog">Каталог</a><a href="#story">Наша история</a><a href="#values">Почему мы</a>
       </nav>
@@ -411,7 +412,7 @@
           <span class="eyebrow">Из Казахстана — с теплом</span>
           <h2>У хорошего мёда всегда есть своя история.</h2>
           <p>Она начинается там, где чистый воздух, цветущие луга и трудолюбивые пчёлы. Мы бережно сохраняем эту историю в каждой банке АпивитА.</p>
-          <a class="text-link" href="https://t.me/apivita_support" target="_blank" rel="noopener">Познакомиться поближе <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10h13M10 4l6 6-6 6"/></svg></a>
+          <a class="text-link" href="https://onlyhoney.kz/torgovaya-marka/apivita" target="_blank" rel="noopener">Подробнее о производителе <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10h13M10 4l6 6-6 6"/></svg></a>
         </div>
       </div>
     </section>
@@ -438,10 +439,10 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-about"><a class="brand" href="#"><span class="brand-mark">✳</span><span class="brand-name">Апивит<span>А</span></span></a><p>Натуральный мёд и продукты пчеловодства из Казахстана. Сделано с заботой — для вашего дома.</p></div>
+      <div class="footer-about"><a class="brand" href="#top"><span class="brand-mark">✳</span><span class="brand-name">Апивит<span>А</span></span></a><p>Натуральный мёд и продукты пчеловодства из Казахстана. Сделано с заботой — для вашего дома.</p></div>
       <div class="footer-column"><h4>Магазин</h4><a href="#catalog">Весь каталог</a><a href="#catalog" data-footer-filter="plastic">Мёд в пластике</a><a href="#catalog" data-footer-filter="glass">Мёд в стекле</a></div>
-      <div class="footer-column"><h4>АпивитА</h4><a href="#story">Наша история</a><a href="#values">Наши ценности</a><a href="https://t.me/apivita_support" target="_blank" rel="noopener">Связаться с нами</a></div>
-      <div class="footer-column"><h4>Мы на связи</h4><a href="https://t.me/apivita_support" target="_blank" rel="noopener">@apivita_support</a><a href="https://t.me/apivita_order_bot" target="_blank" rel="noopener">Telegram-магазин</a></div>
+      <div class="footer-column"><h4>&#1040;&#1087;&#1080;&#1074;&#1080;&#1090;&#1040;</h4><a href="#story">&#1053;&#1072;&#1096;&#1072;&#32;&#1080;&#1089;&#1090;&#1086;&#1088;&#1080;&#1103;</a><a href="#values">&#1053;&#1072;&#1096;&#1080;&#32;&#1094;&#1077;&#1085;&#1085;&#1086;&#1089;&#1090;&#1080;</a><a href="https://wa.me/77010340020" target="_blank" rel="noopener">&#1053;&#1072;&#1087;&#1080;&#1089;&#1072;&#1090;&#1100; &#1074; WhatsApp</a></div>
+      <div class="footer-column"><h4>&#1052;&#1099;&#32;&#1085;&#1072;&#32;&#1089;&#1074;&#1103;&#1079;&#1080;</h4><a href="tel:+77010340020">+7 701 034-00-20</a><a href="mailto:info@onlyhoney.kz">info@onlyhoney.kz</a><a href="https://onlyhoney.kz/torgovaya-marka/apivita" target="_blank" rel="noopener">OnlyHoney.kz &middot; &#1040;&#1087;&#1080;&#1074;&#1080;&#1090;&#1072;</a></div>
     </div>
     <div class="footer-bottom"><span>© 2026 АпивитА. С теплом из Казахстана.</span><span>🍯 Натуральный вкус каждый день</span></div>
   </footer>
@@ -487,7 +488,7 @@
       tg?.expand();
       const isTelegram = Boolean(tg?.initData);
       const headers = { "Content-Type": "application/json", "X-Telegram-Init-Data": tg?.initData || "" };
-      const state = { products: [], cart: [], filter: "all", search: "", favorites: new Set(), visibleCount: 12 };
+      const state = { products: [], cart: [], filter: "all", search: "", favorites: new Set(), selectedVariants: new Map(), visibleCount: 12 };
       const money = value => `${Number(value).toLocaleString("ru-RU")} ₸`;
       const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
       const categoryNames = { plastic: "Мёд в пластике", glass: "Мёд в стекле", other: "Дары пчёл" };
@@ -531,33 +532,46 @@
       }
       function renderProducts() {
         const query = state.search.trim().toLocaleLowerCase("ru");
-        const products = state.products.filter(product =>
-          (state.filter === "all" || product.category === state.filter) &&
-          `${product.name} ${categoryNames[product.category] || ""} ${product.weight || ""}`.toLocaleLowerCase("ru").includes(query)
+        const groups = new Map();
+        state.products.forEach(product => {
+          const nameKey = product.name.trim().toLocaleLowerCase("ru");
+          const key = product.category === "plastic" || product.category === "glass" ? `honey:${nameKey}` : `${product.category}:${nameKey}`;
+          if (!groups.has(key)) groups.set(key, { key, name: product.name, variants: [] });
+          groups.get(key).variants.push(product);
+        });
+        const products = [...groups.values()].map(group => {
+          const variants = group.variants.filter(product => state.filter === "all" || product.category === state.filter);
+          return { ...group, variants, selected: variants.find(product => product.id === state.selectedVariants.get(group.key)) || variants[0] };
+        }).filter(group => group.variants.length &&
+          `${group.name} ${group.variants.map(product => `${categoryNames[product.category] || ""} ${product.weight || ""} ${product.container || ""}`).join(" ")}`.toLocaleLowerCase("ru").includes(query)
         );
         const root = document.querySelector("#products");
         if (!products.length) {
-          root.innerHTML = `<div class="empty-state">${state.products.length ? "По вашему запросу ничего не нашлось. Попробуйте другой сорт или категорию." : "Не получилось загрузить каталог. Обновите страницу чуть позже."}</div>`;
+          root.innerHTML = `<div class="empty-state">${state.products.length ? "\u041f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443 \u043d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0434\u0440\u0443\u0433\u043e\u0439 \u0437\u0430\u043f\u0440\u043e\u0441." : "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043a\u0430\u0442\u0430\u043b\u043e\u0433. \u041e\u0431\u043d\u043e\u0432\u0438\u0442\u0435 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0443."}</div>`;
           document.querySelector("#catalog-more").hidden = true;
           return;
         }
-        root.innerHTML = products.slice(0, state.visibleCount).map((product, index) => `
+        root.innerHTML = products.slice(0, state.visibleCount).map((group, index) => {
+          const product = group.selected;
+          const variantOptions = group.variants.map(variant => `<option value="${variant.id}" ${variant.id === product.id ? "selected" : ""}>${escapeHtml(variant.container || categoryNames[variant.category] || "\u0424\u0430\u0441\u043e\u0432\u043a\u0430")} &middot; ${variant.weight ? `${Number(variant.weight).toLocaleString("ru-RU")} \u0433` : ""}</option>`).join("");
+          return `
           <article class="product-card" data-product-card="${product.id}">
             <div class="product-art art-${escapeHtml(product.category)}">
-              <span class="product-badge">${index < 2 && state.filter === "all" ? "Выбор пасеки" : escapeHtml(categoryNames[product.category] || "Натуральное")}</span>
-              <button class="favorite ${state.favorites.has(product.id) ? "liked" : ""}" data-favorite="${product.id}" aria-label="Добавить в избранное">${state.favorites.has(product.id) ? "♥" : "♡"}</button>
+              <span class="product-badge">${index < 2 && state.filter === "all" ? "\u0412\u044b\u0431\u043e\u0440 \u043f\u0430\u0441\u0435\u043a\u0438" : escapeHtml(categoryNames[product.category] || "")}</span>
+              <button class="favorite ${state.favorites.has(product.id) ? "liked" : ""}" data-favorite="${product.id}" aria-label="\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435">${state.favorites.has(product.id) ? "&#9829;" : "&#9825;"}</button>
               ${imageFor(product)}
             </div>
             <div class="product-info">
-              <div class="product-category">${escapeHtml(categoryNames[product.category] || "Натуральный продукт")}</div>
-              <button class="product-name product-detail-trigger" data-product-detail="${product.id}" aria-label="Описание товара ${escapeHtml(product.name)}">${escapeHtml(product.name)}</button>
-              <div class="product-meta">${product.weight ? `${Number(product.weight).toLocaleString("ru-RU")} г` : "С заботой о природе"}${product.container ? ` · ${escapeHtml(product.container)}` : ""}</div>
-              <div class="product-bottom"><span class="product-price">${money(product.price)}</span><button class="add-button" data-add="${product.id}" aria-label="Добавить ${escapeHtml(product.name)} в корзину">+</button></div>
+              <div class="product-category">${escapeHtml(categoryNames[product.category] || "")}</div>
+              <button class="product-name product-detail-trigger" data-product-detail="${product.id}" aria-label="\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0442\u043e\u0432\u0430\u0440\u0430 ${escapeHtml(product.name)}">${escapeHtml(product.name)}</button>
+              ${group.variants.length > 1 ? `<label class="sr-only" for="variant-${index}">\u0424\u0430\u0441\u043e\u0432\u043a\u0430 ${escapeHtml(group.name)}</label><select class="variant-select" id="variant-${index}" data-variant-group="${escapeHtml(group.key)}">${variantOptions}</select>` : `<div class="product-meta">${product.weight ? `${Number(product.weight).toLocaleString("ru-RU")} \u0433` : ""}${product.container ? ` &middot; ${escapeHtml(product.container)}` : ""}</div>`}
+              <div class="product-bottom"><span class="product-price">${money(product.price)}</span><button class="add-button" data-add="${product.id}" aria-label="\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c ${escapeHtml(product.name)} \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0443">+</button></div>
             </div>
-          </article>`).join("");
+          </article>`;
+        }).join("");
         const more = document.querySelector("#catalog-more");
         more.hidden = products.length <= state.visibleCount;
-        document.querySelector("#show-more-products").textContent = `Показать ещё (${products.length - state.visibleCount})`;
+        document.querySelector("#show-more-products").textContent = `\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0435\u0449\u0451 (${products.length - state.visibleCount})`;
       }
       function updateCartCount() {
         const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -587,7 +601,7 @@
       }
       async function addProduct(productId) {
         if (!isTelegram) {
-          showToast("Чтобы добавить товар в корзину, откройте магазин в Telegram.");
+          showToast("Напишите нам в WhatsApp, чтобы оформить заказ.");
           return;
         }
         const product = state.products.find(item => item.id === productId);
@@ -620,7 +634,7 @@
           <div class="product-detail-copy">
             <span class="eyebrow">${escapeHtml(categoryNames[product.category] || "Натуральный продукт")}</span>
             <h2 id="product-detail-title">${escapeHtml(product.name)}</h2>
-            <p>${escapeHtml(product.description || "Подробное описание этого продукта скоро появится. Уточнить детали можно в @apivita_support.")}</p>
+            <p>${escapeHtml(product.description || "Подробное описание этого продукта скоро появится. Уточнить детали можно в WhatsApp +7 701 034-00-20.")}</p>
             <div class="detail-meta">${product.weight ? `<span class="detail-chip">${Number(product.weight).toLocaleString("ru-RU")} г</span>` : ""}${product.container ? `<span class="detail-chip">${escapeHtml(product.container)}</span>` : ""}<span class="detail-chip">АпивитА · Казахстан</span></div>
             <div class="detail-price">${money(product.price)}</div>
             <button class="button" data-detail-add="${product.id}">Добавить в корзину</button>
@@ -649,7 +663,7 @@
           document.querySelector("#orders-content").innerHTML = `
             <div class="empty-state">
               Чтобы посмотреть историю заказов, откройте магазин через Telegram.
-              <p><a class="button" href="https://t.me/apivita_order_bot" target="_blank" rel="noopener">Открыть Telegram-магазин</a></p>
+              <p><a class="button" href="https://wa.me/77010340020" target="_blank" rel="noopener">WhatsApp</a></p>
             </div>`;
           return;
         }
@@ -697,6 +711,31 @@
         state.search = event.target.value;
         state.visibleCount = 12;
         renderProducts();
+      });
+      document.querySelector("#products").addEventListener("change", event => {
+        const select = event.target.closest("[data-variant-group]");
+        if (!select) return;
+        const card = select.closest("[data-product-card]");
+        const product = state.products.find(item => item.id === Number(select.value));
+        if (!card || !product) return;
+        state.selectedVariants.set(select.dataset.variantGroup, product.id);
+        card.dataset.productCard = product.id;
+        card.querySelector("[data-product-detail]").dataset.productDetail = product.id;
+        card.querySelector("[data-add]").dataset.add = product.id;
+        card.querySelector("[data-favorite]").dataset.favorite = product.id;
+        card.querySelector(".product-price").textContent = money(product.price);
+        card.querySelector(".product-category").textContent = categoryNames[product.category] || "";
+        card.querySelector(".product-badge").textContent = categoryNames[product.category] || "";
+        const art = card.querySelector(".product-art");
+        art.classList.remove("art-plastic", "art-glass", "art-other");
+        art.classList.add(`art-${product.category}`);
+        const jar = art.querySelector(".jar");
+        if (jar) jar.classList.toggle("jar-glass", product.category === "glass");
+        const weightLabel = art.querySelector(".label small");
+        if (weightLabel) weightLabel.textContent = product.weight ? `${product.weight} \u0433` : "";
+        const favorite = card.querySelector("[data-favorite]");
+        favorite.classList.toggle("liked", state.favorites.has(product.id));
+        favorite.textContent = state.favorites.has(product.id) ? "\u2665" : "\u2661";
       });
       document.querySelector("#products").addEventListener("click", async event => {
         const detailTrigger = event.target.closest("[data-product-detail]");
@@ -769,8 +808,8 @@
       document.querySelector("#checkout-button").addEventListener("click", () => {
         if (!state.cart.length) { showToast("Добавьте в корзину что-нибудь вкусное"); return; }
         if (!isTelegram) {
-          showToast("Заказ можно оформить из Telegram-магазина.");
-          window.open("https://t.me/apivita_order_bot", "_blank", "noopener");
+          showToast("\u041d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u043d\u0430\u043c \u0432 WhatsApp, \u0447\u0442\u043e\u0431\u044b \u043e\u0444\u043e\u0440\u043c\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437.");
+          window.open("https://wa.me/77010340020", "_blank", "noopener");
           return;
         }
         setDrawer(false);
