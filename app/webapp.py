@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import time
+from types import SimpleNamespace
 from urllib.parse import parse_qsl
 
 from aiogram import Bot, Dispatcher
@@ -70,7 +71,7 @@ def _telegram_user_dependency(request: Request) -> dict:
 
 
 @app.get("/api/products")
-async def products(telegram_user: dict = Depends(_telegram_user_dependency)):
+async def products():
     async with get_session() as session:
         result = await session.execute(
             select(Product).where(Product.is_active.is_(True)).order_by(Product.category, Product.name, Product.weight_grams)
@@ -146,6 +147,33 @@ async def delete_cart_item(product_id: int, telegram_user: dict = Depends(_teleg
         return {"ok": True}
 
 
+@app.get("/api/orders")
+async def get_orders(telegram_user: dict = Depends(_telegram_user_dependency)):
+    async with get_session() as session:
+        user = await _get_user(session, telegram_user)
+        result = await session.execute(
+            select(Order)
+            .options(selectinload(Order.items))
+            .where(Order.user_id == user.id)
+            .order_by(Order.created_at.desc())
+        )
+        orders = result.scalars().all()
+        return [{
+            "id": order.id,
+            "status": order.status.value,
+            "created_at": order.created_at.isoformat(),
+            "total": float(order.total_price),
+            "city": order.city,
+            "address": order.address,
+            "comment": order.comment,
+            "items": [{
+                "name": item.product_name,
+                "quantity": item.quantity,
+                "price": float(item.price_per_unit),
+            } for item in order.items],
+        } for order in orders]
+
+
 @app.post("/api/orders")
 async def create_order(request: Request, telegram_user: dict = Depends(_telegram_user_dependency)):
     try:
@@ -156,6 +184,7 @@ async def create_order(request: Request, telegram_user: dict = Depends(_telegram
         raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
     if not city or not address or not phone or len(city) > 255 or len(address) > 2000 or len(comment) > 2000 or len(phone) > 32:
         raise HTTPException(status_code=400, detail="Заполните город, адрес и телефон.")
+    notification_items = []
     async with get_session() as session:
         user = await _get_user(session, telegram_user)
         result = await session.execute(
@@ -171,11 +200,35 @@ async def create_order(request: Request, telegram_user: dict = Depends(_telegram
         session.add(order)
         await session.flush()
         for item in items:
+            notification_items.append({
+                "name": item.product.name,
+                "price": item.product.price,
+                "quantity": item.quantity,
+            })
             session.add(OrderItem(order_id=order.id, product_id=item.product_id,
                                   product_name=item.product.name, quantity=item.quantity,
                                   price_per_unit=item.product.price))
             await session.delete(item)
-        return {"ok": True, "order_id": order.id}
+        order_id = order.id
+        notification_order = SimpleNamespace(
+            id=order.id,
+            total_price=order.total_price,
+            city=order.city,
+            address=order.address,
+            comment=order.comment,
+            created_at=order.created_at,
+            status=order.status,
+        )
+        notification_user = SimpleNamespace(
+            username=user.username,
+            full_name=user.full_name,
+            phone=user.phone,
+        )
+
+    from app.services.notifications import notify_admin_new_order
+
+    await notify_admin_new_order(bot, notification_order, notification_user, notification_items)
+    return {"ok": True, "order_id": order_id}
 
 
 @app.post("/telegram/webhook")
