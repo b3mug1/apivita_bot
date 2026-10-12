@@ -79,7 +79,7 @@ async def products():
         return [{
             "id": p.id, "name": p.name, "category": p.category,
             "container": p.container_type, "weight": p.weight_grams,
-            "price": float(p.price),
+            "price": float(p.price), "description": p.description,
         } for p in result.scalars()]
 
 

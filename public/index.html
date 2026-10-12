@@ -207,10 +207,9 @@
     .floating-cart:hover { transform: translateY(-3px); box-shadow: 0 13px 30px #141b1555; }
     .floating-cart svg { width: 23px; height: 23px; }
     .floating-cart .cart-count { top: -2px; right: -2px; }
-    .product-modal, .orders-overlay { position: fixed; z-index: 30; inset: 0; display: grid; padding: 18px; place-items: center; background: #151a1477; opacity: 0; pointer-events: none; transition: opacity .22s; }
-    .product-modal.open, .orders-overlay.open { opacity: 1; pointer-events: auto; }
-    .product-detail { position: relative; display: grid; width: min(760px, 100%); max-height: min(90dvh, 720px); overflow-y: auto; grid-template-columns: .95fr 1.05fr; border: 1px solid var(--line); border-radius: 12px 12px 42px 12px; background: var(--paper); transform: translateY(12px); transition: transform .22s; }
-    .product-modal.open .product-detail { transform: translateY(0); }
+    .product-modal, .orders-overlay { position: fixed; z-index: 100; inset: 0; display: grid; padding: 18px; overflow-y: auto; place-items: center; background: #151a1477; opacity: 0; visibility: hidden; pointer-events: none; overscroll-behavior: contain; }
+    .product-modal.open, .orders-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+    .product-detail { position: relative; display: grid; width: min(760px, 100%); max-height: min(90dvh, 720px); overflow-y: auto; grid-template-columns: .95fr 1.05fr; border: 1px solid var(--line); border-radius: 12px 12px 42px 12px; background: var(--paper); }
     .product-detail-art { position: relative; display: grid; min-height: 390px; place-items: center; border-radius: 11px 0 0 0; background: linear-gradient(145deg,#eff0dd,#d9e0c8); }
     .product-detail-art.art-glass { background: linear-gradient(145deg,#f2e5ca,#e7d1a5); }
     .product-detail-art.art-other { background: linear-gradient(145deg,#e6ebde,#cbd6bf); }
@@ -225,8 +224,7 @@
     .product-detail-copy .button { width: 100%; }
     .product-detail-close { position: absolute; z-index: 2; top: 14px; right: 14px; }
     .orders-overlay { z-index: 32; }
-    .orders-panel { display: flex; width: min(620px, 100%); max-height: min(88dvh, 760px); flex-direction: column; padding: 24px; border: 1px solid var(--line); border-radius: 12px 12px 38px 12px; background: var(--paper); transform: translateY(12px); transition: transform .22s; }
-    .orders-overlay.open .orders-panel { transform: translateY(0); }
+    .orders-panel { display: flex; width: min(620px, 100%); max-height: min(88dvh, 760px); flex-direction: column; padding: 24px; border: 1px solid var(--line); border-radius: 12px 12px 38px 12px; background: var(--paper); }
     .orders-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
     .orders-header h2 { margin: 0; font-family: var(--serif); font-size: 29px; font-weight: 500; }
     .orders-content { overflow-y: auto; padding: 14px 2px 3px; }
@@ -620,17 +618,15 @@
           <div class="product-detail-copy">
             <span class="eyebrow">${escapeHtml(categoryNames[product.category] || "Натуральный продукт")}</span>
             <h2 id="product-detail-title">${escapeHtml(product.name)}</h2>
-            <p>Натуральный продукт пчеловодства из Казахстана. Мы аккуратно фасуем его и отправляем с заботой о каждой банке.</p>
+            <p>${escapeHtml(product.description || "Подробное описание этого продукта скоро появится. Уточнить детали можно в @apivita_support.")}</p>
             <div class="detail-meta">${product.weight ? `<span class="detail-chip">${Number(product.weight).toLocaleString("ru-RU")} г</span>` : ""}${product.container ? `<span class="detail-chip">${escapeHtml(product.container)}</span>` : ""}<span class="detail-chip">АпивитА · Казахстан</span></div>
             <div class="detail-price">${money(product.price)}</div>
             <button class="button" data-detail-add="${product.id}">Добавить в корзину</button>
           </div>`;
         document.querySelector("#product-modal").classList.add("open");
-        document.body.style.overflow = "hidden";
       }
       function closeProduct() {
         document.querySelector("#product-modal").classList.remove("open");
-        if (!document.querySelector("#orders-overlay").classList.contains("open")) document.body.style.overflow = "";
       }
       function renderOrders(orders) {
         const content = document.querySelector("#orders-content");
