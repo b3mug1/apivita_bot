@@ -26,6 +26,7 @@ async def set_bot_commands(bot: Bot) -> None:
     user_commands = [
         BotCommand(command="start", description="🔄 Перезапустить бота"),
         BotCommand(command="catalog", description="🛍 Каталог товаров"),
+        BotCommand(command="tags", description="🏷 Теги и категории товаров"),
         BotCommand(command="cart", description="🛒 Моя корзина"),
         BotCommand(command="orders", description="📦 Мои заказы"),
         BotCommand(command="about", description="ℹ️ О нас"),

@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import List
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 class Settings(BaseSettings):
@@ -25,16 +26,28 @@ class Settings(BaseSettings):
     @property
     def db_url(self) -> str:
         if self.DATABASE_URL:
-            url = self.DATABASE_URL
-            if url.startswith("postgres://"):
-                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-            elif url.startswith("postgresql://"):
-                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-            return url
+            parts = urlsplit(self.DATABASE_URL)
+            scheme = "postgresql+asyncpg" if parts.scheme in {"postgres", "postgresql"} else parts.scheme
+            query = urlencode(
+                [
+                    (key, value)
+                    for key, value in parse_qsl(parts.query, keep_blank_values=True)
+                    if key not in {"channel_binding", "sslmode"}
+                ]
+            )
+            return urlunsplit((scheme, parts.netloc, parts.path, query, parts.fragment))
         return (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
+
+    @property
+    def db_ssl_required(self) -> bool:
+        if not self.DATABASE_URL:
+            return False
+        return dict(parse_qsl(urlsplit(self.DATABASE_URL).query)).get("sslmode") in {
+            "require", "verify-ca", "verify-full"
+        }
 
     class Config:
         env_file = ".env"

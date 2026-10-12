@@ -22,6 +22,7 @@ engine: AsyncEngine = create_async_engine(
     pool_pre_ping=True,
     pool_size=1 if settings.VERCEL else 10,
     max_overflow=0 if settings.VERCEL else 20,
+    connect_args={"ssl": True} if settings.db_ssl_required else {},
 )
 
 async_session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(

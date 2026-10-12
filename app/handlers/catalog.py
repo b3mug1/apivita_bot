@@ -93,6 +93,18 @@ CATEGORY_LABELS = {
     "other":   "🌿 Другое",
 }
 
+
+@router.message(Command("tags"))
+@router.message(F.text.regexp(r"^/теги(?:@\w+)?(?:\s|$)"))
+async def show_catalog_tags(message: Message) -> None:
+    """Show the catalog categories available as product tags."""
+    await message.answer(
+        "🏷 <b>Категории товаров</b>\n\nВыберите раздел, чтобы посмотреть товары:",
+        reply_markup=categories_keyboard(),
+        parse_mode="HTML",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Keyboard builders
 # ---------------------------------------------------------------------------
