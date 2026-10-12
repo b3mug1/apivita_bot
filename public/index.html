@@ -130,6 +130,8 @@
     .product-info { padding: 16px 16px 15px; }
     .product-category { color: #939482; font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
     .product-name { min-height: 43px; margin: 7px 0 3px; font-family: var(--serif); font-size: 17px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+    .product-detail-trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
+    .product-detail-trigger:hover { color: var(--green); }
     .product-meta { color: #898b7d; font-size: 10px; }
     .product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 14px; }
     .product-price { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
@@ -466,15 +468,15 @@
         <button class="button" type="submit">Подтвердить заказ</button>
       </form>
     </div>
-    <div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
-      <div class="product-detail" id="product-detail"></div>
-    </div>
-    <div class="orders-overlay" id="orders-overlay" role="dialog" aria-modal="true" aria-labelledby="orders-title">
-      <section class="orders-panel">
-        <div class="orders-header"><h2 id="orders-title">Мои заказы</h2><button class="close-btn" id="close-orders" aria-label="Закрыть">×</button></div>
-        <div class="orders-content" id="orders-content"></div>
-      </section>
-    </div>
+  </div>
+  <div class="product-modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
+    <div class="product-detail" id="product-detail"></div>
+  </div>
+  <div class="orders-overlay" id="orders-overlay" role="dialog" aria-modal="true" aria-labelledby="orders-title">
+    <section class="orders-panel">
+      <div class="orders-header"><h2 id="orders-title">Мои заказы</h2><button class="close-btn" id="close-orders" aria-label="Закрыть">×</button></div>
+      <div class="orders-content" id="orders-content"></div>
+    </section>
   </div>
   <div class="toast" id="toast" role="status"></div>
 
@@ -540,7 +542,7 @@
           return;
         }
         root.innerHTML = products.slice(0, state.visibleCount).map((product, index) => `
-          <article class="product-card" data-product-card="${product.id}" tabindex="0" role="button" aria-label="Подробнее о товаре ${escapeHtml(product.name)}">
+          <article class="product-card" data-product-card="${product.id}">
             <div class="product-art art-${escapeHtml(product.category)}">
               <span class="product-badge">${index < 2 && state.filter === "all" ? "Выбор пасеки" : escapeHtml(categoryNames[product.category] || "Натуральное")}</span>
               <button class="favorite ${state.favorites.has(product.id) ? "liked" : ""}" data-favorite="${product.id}" aria-label="Добавить в избранное">${state.favorites.has(product.id) ? "♥" : "♡"}</button>
@@ -548,7 +550,7 @@
             </div>
             <div class="product-info">
               <div class="product-category">${escapeHtml(categoryNames[product.category] || "Натуральный продукт")}</div>
-              <h3 class="product-name">${escapeHtml(product.name)}</h3>
+              <button class="product-name product-detail-trigger" data-product-detail="${product.id}" aria-label="Описание товара ${escapeHtml(product.name)}">${escapeHtml(product.name)}</button>
               <div class="product-meta">${product.weight ? `${Number(product.weight).toLocaleString("ru-RU")} г` : "С заботой о природе"}${product.container ? ` · ${escapeHtml(product.container)}` : ""}</div>
               <div class="product-bottom"><span class="product-price">${money(product.price)}</span><button class="add-button" data-add="${product.id}" aria-label="Добавить ${escapeHtml(product.name)} в корзину">+</button></div>
             </div>
@@ -642,7 +644,13 @@
       }
       async function openOrders() {
         if (!isTelegram) {
-          showToast("История заказов доступна при открытии магазина из Telegram.");
+          const overlay = document.querySelector("#orders-overlay");
+          overlay.classList.add("open");
+          document.querySelector("#orders-content").innerHTML = `
+            <div class="empty-state">
+              Чтобы посмотреть историю заказов, откройте магазин через Telegram.
+              <p><a class="button" href="https://t.me/apivita_order_bot" target="_blank" rel="noopener">Открыть Telegram-магазин</a></p>
+            </div>`;
           return;
         }
         const overlay = document.querySelector("#orders-overlay");
@@ -691,6 +699,11 @@
         renderProducts();
       });
       document.querySelector("#products").addEventListener("click", async event => {
+        const detailTrigger = event.target.closest("[data-product-detail]");
+        if (detailTrigger) {
+          openProduct(Number(detailTrigger.dataset.productDetail));
+          return;
+        }
         const favorite = event.target.closest("[data-favorite]");
         if (favorite) {
           const id = Number(favorite.dataset.favorite);
