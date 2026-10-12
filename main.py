@@ -4,6 +4,7 @@ Apivita Telegram Bot - Main entry point
 """
 import asyncio
 import logging
+import os
 import sys
 
 from aiogram import Bot, Dispatcher
@@ -84,6 +85,22 @@ async def main() -> None:
     # Set bot commands
     await set_bot_commands(bot)
     
+    # Start healthcheck server for Render Web Service (if PORT is set)
+    web_runner = None
+    port = os.getenv("PORT")
+    if port:
+        from aiohttp import web
+        app = web.Application()
+        async def health_check(_request):
+            return web.Response(text="Bot is running!")
+        app.router.add_get("/", health_check)
+        app.router.add_get("/health", health_check)
+        web_runner = web.AppRunner(app)
+        await web_runner.setup()
+        site = web.TCPSite(web_runner, "0.0.0.0", int(port))
+        await site.start()
+        logger.info(f"Healthcheck HTTP server running on port {port}")
+
     # Start polling
     logger.info("Bot is running. Press Ctrl+C to stop.")
     try:
@@ -93,6 +110,8 @@ async def main() -> None:
             drop_pending_updates=True,
         )
     finally:
+        if web_runner:
+            await web_runner.cleanup()
         await close_db()
         await bot.session.close()
         logger.info("Bot stopped.")
