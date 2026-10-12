@@ -20,8 +20,8 @@ engine: AsyncEngine = create_async_engine(
     settings.db_url,
     echo=False,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
+    pool_size=1 if settings.VERCEL else 10,
+    max_overflow=0 if settings.VERCEL else 20,
 )
 
 async_session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(

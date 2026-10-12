@@ -5,6 +5,7 @@ Handles displaying order history and order details.
 import logging
 from datetime import datetime
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -126,6 +127,7 @@ def _format_order_detail(order: dict) -> str:
 # Handlers
 # ---------------------------------------------------------------------------
 
+@router.message(Command("orders"))
 @router.message(F.text == "📦 Мои заказы")
 async def show_orders(message: Message) -> None:
     user_id = message.from_user.id

@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     DB_USER: str = "apivita_user"
     DB_PASSWORD: str = ""
     DATABASE_URL: str = ""
+    WEBAPP_URL: str = ""
+    REDIS_URL: str = ""
+    WEBHOOK_SECRET: str = ""
+    VERCEL: bool = False
     DEFAULT_LANG: str = "ru"
     LOG_LEVEL: str = "INFO"
 

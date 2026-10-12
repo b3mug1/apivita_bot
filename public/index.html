@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#f7f3e8">
+  <title>АпивитА — магазин мёда</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{font-family:system-ui,-apple-system,sans-serif;color:#263522;background:#f7f3e8;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0;padding:16px 16px 104px;background:#f7f3e8}
+    header{padding:10px 2px 18px}h1{font-size:26px;margin:0;color:#35532c}header p{margin:5px 0;color:#777}
+    #catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+    .card,.cart{background:#fff;border-radius:16px;padding:14px;box-shadow:0 3px 14px #463e1710}
+    .emoji{font-size:35px}.name{font-weight:700;margin:8px 0 3px}.meta{color:#777;font-size:13px}
+    .price{font-weight:700;color:#5b762d;margin:12px 0}
+    button{border:0;border-radius:12px;padding:11px 14px;background:#547236;color:white;font-weight:700;font-size:15px}
+    button.secondary{background:#e8eddf;color:#3f582d}.card button{width:100%}
+    nav{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;box-shadow:0 -4px 18px #2221}
+    nav button{flex:1}.hidden{display:none!important}.cart{margin:8px 0}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    input,textarea{width:100%;padding:13px;border:1px solid #ddd;border-radius:11px;margin:6px 0 12px;font:inherit;background:#fff}
+    label{font-size:14px;font-weight:600}.total{font-size:19px;font-weight:800;margin:18px 0}
+    #notice{padding:12px;border-radius:10px;background:#fff0d2;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <header><h1>🍯 АпивитА</h1><p>Натуральный мёд из Казахстана</p></header>
+  <div id="notice" class="hidden"></div>
+  <main id="catalog-view"><div id="catalog"></div></main>
+  <main id="cart-view" class="hidden">
+    <h2>Корзина</h2><div id="cart-items"></div><div id="total" class="total"></div>
+    <form id="checkout">
+      <label>Город<input name="city" required maxlength="255" placeholder="Алматы"></label>
+      <label>Адрес доставки<input name="address" required maxlength="2000" placeholder="Улица, дом, квартира"></label>
+      <label>Телефон<input name="phone" required type="tel" maxlength="32" placeholder="+7 ..."></label>
+      <label>Комментарий<textarea name="comment" maxlength="2000" rows="2" placeholder="Необязательно"></textarea></label>
+      <button type="submit">Оформить заказ</button>
+    </form>
+  </main>
+  <nav><button id="catalog-tab" class="secondary">Каталог</button><button id="cart-tab">Корзина</button></nav>
+  <script>
+    const tg=window.Telegram?.WebApp; tg?.ready(); tg?.expand();
+    const headers={'Content-Type':'application/json','X-Telegram-Init-Data':tg?.initData||''};
+    const notice=document.querySelector('#notice');
+    async function api(url,options={}){const r=await fetch(url,{...options,headers:{...headers,...options.headers}});if(!r.ok)throw Error(await r.text());return r.json()}
+    function error(e){notice.textContent=e.message||'Не удалось выполнить запрос. Попробуйте ещё раз.';notice.classList.remove('hidden')}
+    async function loadProducts(){try{const products=await api('/api/products');document.querySelector('#catalog').innerHTML=products.map(p=>`<article class="card"><div class="emoji">🍯</div><div class="name">${escapeHtml(p.name)}</div><div class="meta">${p.weight?`${p.weight} г`:''} ${escapeHtml(p.container||'')}</div><div class="price">${Number(p.price).toLocaleString('ru-RU')} ₸</div><button data-id="${p.id}">В корзину</button></article>`).join('');document.querySelectorAll('#catalog button').forEach(b=>b.onclick=async()=>{try{await api('/api/cart',{method:'POST',body:JSON.stringify({product_id:Number(b.dataset.id),quantity:1})});tg?.HapticFeedback?.notificationOccurred('success')}catch(e){error(e)}})}catch(e){error(e)}}
+    async function loadCart(){try{const cart=await api('/api/cart');document.querySelector('#cart-items').innerHTML=cart.items.length?cart.items.map(i=>`<div class="cart row"><span>${escapeHtml(i.name)} ${i.weight?`${i.weight} г`:''}<br><small>${i.quantity} × ${Number(i.price).toLocaleString('ru-RU')} ₸</small></span><button class="secondary" data-remove="${i.product_id}">Убрать</button></div>`).join(''):'<p>Корзина пока пуста.</p>';document.querySelector('#total').textContent=`Итого: ${Number(cart.total).toLocaleString('ru-RU')} ₸`;document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=async()=>{try{await api(`/api/cart/${b.dataset.remove}`,{method:'DELETE'});loadCart()}catch(e){error(e)}})}catch(e){error(e)}}
+    function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function show(view){document.querySelector('#catalog-view').classList.toggle('hidden',view!=='catalog');document.querySelector('#cart-view').classList.toggle('hidden',view!=='cart');document.querySelector('#catalog-tab').classList.toggle('secondary',view==='cart');document.querySelector('#cart-tab').classList.toggle('secondary',view==='catalog');if(view==='cart')loadCart()}
+    document.querySelector('#catalog-tab').onclick=()=>show('catalog');document.querySelector('#cart-tab').onclick=()=>show('cart');
+    document.querySelector('#checkout').onsubmit=async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const data=Object.fromEntries(new FormData(e.target));const result=await api('/api/orders',{method:'POST',body:JSON.stringify(data)});notice.textContent=`Заказ №${result.order_id} оформлен! Мы скоро свяжемся с вами.`;notice.classList.remove('hidden');e.target.reset();await loadCart();tg?.HapticFeedback?.notificationOccurred('success')}catch(err){error(err)}finally{button.disabled=false}};
+    if(!tg?.initData){notice.textContent='Откройте магазин через Telegram, чтобы продолжить.';notice.classList.remove('hidden')}loadProducts();
+  </script>
+</body>
+</html>

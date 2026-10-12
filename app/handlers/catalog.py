@@ -4,6 +4,7 @@ Handles browsing categories, products and adding items to cart.
 """
 import logging
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import StateFilter
@@ -160,6 +161,7 @@ def _format_product_detail(pid: str) -> str:
 # Handlers
 # ---------------------------------------------------------------------------
 
+@router.message(Command("catalog"))
 @router.message(F.text == "🛒 Каталог")
 async def show_catalog(message: Message) -> None:
     """Entry point: show category selector."""

@@ -4,6 +4,7 @@ Handles cart display, item removal, clearing, and the checkout FSM.
 """
 import logging
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -126,6 +127,7 @@ def _format_order_summary(city: str, address: str, comment: str | None, items: l
 # Show cart
 # ---------------------------------------------------------------------------
 
+@router.message(Command("cart"))
 @router.message(F.text == "🛒 Корзина")
 async def show_cart(message: Message) -> None:
     user_id = message.from_user.id

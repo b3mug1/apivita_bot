@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ LOGO_PATH = Path(__file__).resolve().parent.parent.parent / "assets" / "logo.jpg
 # Handlers
 # ---------------------------------------------------------------------------
 
+@router.message(Command("about"))
 @router.message(F.text == "ℹ️ О нас")
 async def show_about(message: Message) -> None:
     logger.info("User %s opened 'About' page", message.from_user.id)
