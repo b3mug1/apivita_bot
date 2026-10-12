@@ -15,7 +15,7 @@ services:
       - key: BOT_TOKEN
         sync: false
       - key: ADMIN_IDS
-        value: "1169980105"
+        value: "1169980105,564023521"
       - key: DATABASE_URL
         fromDatabase:
           name: apivita-db
