@@ -105,8 +105,10 @@
     .search-box svg { width: 15px; height: 15px; flex: 0 0 auto; color: #888d7e; }
     .search-box input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 11px; }
     .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-    .product-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px 8px 28px 8px; background: var(--white); cursor: pointer; transition: transform .25s, box-shadow .25s; }
+    .product-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px 8px 28px 8px; background: var(--white); cursor: pointer; transition: transform .25s, box-shadow .25s, border-color .25s; }
     .product-card:hover { transform: translateY(-5px); box-shadow: 0 16px 35px #343c2515; }
+    .product-card.expanded { border-color: color-mix(in srgb, var(--green) 48%, var(--line)); }
+    .product-card:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
     .product-art { position: relative; display: grid; height: 220px; overflow: hidden; place-items: center; background: #e8e6d5; }
     .product-art::before, .product-art::after { position: absolute; width: 175px; height: 175px; border-radius: 50%; background: #ffffff35; content: ""; }
     .product-art::before { top: -75px; right: -47px; }
@@ -127,15 +129,24 @@
     .product-badge { position: absolute; z-index: 2; top: 12px; left: 12px; padding: 6px 9px; border-radius: 999px; background: #fffefaD9; color: #65704f; font-size: 9px; font-weight: 600; }
     .favorite { position: absolute; z-index: 2; top: 10px; right: 10px; display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 50%; background: #fffefaD9; color: #59614f; cursor: pointer; font-size: 16px; }
     .favorite.liked { color: #b65b47; }
-    .product-info { padding: 16px 16px 15px; }
+    .product-info { padding: 14px 15px 15px; }
     .product-category { color: #939482; font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-    .product-name { min-height: 43px; margin: 7px 0 3px; font-family: var(--serif); font-size: 17px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
-    .product-detail-trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
-    .product-detail-trigger:hover { color: var(--green); }
-    .product-meta { color: #898b7d; font-size: 10px; }
-    .variant-select { width: 100%; min-height: 38px; margin-top: 12px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); color: var(--ink); font-size: 11px; cursor: pointer; }
-    .product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 14px; }
+    .product-name { min-height: 0; margin: 6px 0 0; font-family: var(--serif); font-size: 17px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+    .product-meta { margin-top: 5px; color: #898b7d; font-size: 10px; }
+    .product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 12px; }
     .product-price { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
+    .product-actions { display: flex; align-items: center; gap: 10px; }
+    .product-expand { display: inline-flex; min-height: 36px; align-items: center; gap: 5px; padding: 0; border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 10px; font-weight: 600; }
+    .product-expand svg { width: 13px; height: 13px; transition: transform .2s; }
+    .product-card.expanded .product-expand svg { transform: rotate(180deg); }
+    .product-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); cursor: default; }
+    .product-card.expanded .product-details { display: block; }
+    .product-description { margin: 0 0 13px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .variant-picker + .variant-picker { margin-top: 10px; }
+    .variant-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 9px; font-weight: 600; }
+    .variant-options { display: flex; flex-wrap: wrap; gap: 5px; }
+    .variant-option { min-height: 30px; padding: 0 9px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 10px; transition: all .2s; }
+    .variant-option:hover, .variant-option.active { border-color: var(--green); background: var(--green); color: white; }
     .add-button { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 50%; background: var(--green); color: white; cursor: pointer; font-size: 21px; line-height: 1; transition: transform .2s, background .2s; }
     .add-button:hover { transform: rotate(90deg); background: #c58b2f; }
     .empty-state { grid-column: 1/-1; padding: 50px 20px; border: 1px dashed #d7d7c9; border-radius: 15px; color: var(--muted); text-align: center; }
@@ -297,10 +308,14 @@
       .jar { transform: scale(.82); }
       .product-card:hover .jar { transform: scale(.82) translateY(-4px) rotate(-2deg); }
       .product-info { padding: 12px 11px 12px; }
-      .product-name { min-height: 39px; font-size: 14px; }
+      .product-name { font-size: 14px; }
       .product-meta { font-size: 9px; }
       .product-price { font-size: 12px; }
       .product-bottom { margin-top: 11px; }
+      .product-expand { min-height: 33px; font-size: 9px; }
+      .product-details { margin-top: 10px; padding-top: 10px; }
+      .product-description { font-size: 9px; }
+      .variant-option { min-height: 29px; padding: 0 8px; font-size: 9px; }
       .add-button { width: 33px; height: 33px; }
       .product-badge { top: 8px; left: 8px; padding: 5px 7px; font-size: 8px; }
       .favorite { top: 7px; right: 7px; width: 29px; height: 29px; }
@@ -487,11 +502,13 @@
       tg?.ready();
       tg?.expand();
       const isTelegram = Boolean(tg?.initData);
+      const browserCartKey = "apivita-cart";
       const headers = { "Content-Type": "application/json", "X-Telegram-Init-Data": tg?.initData || "" };
-      const state = { products: [], cart: [], filter: "all", search: "", favorites: new Set(), selectedVariants: new Map(), visibleCount: 12 };
+      const state = { products: [], cart: [], filter: "all", search: "", favorites: new Set(), selectedVariants: new Map(), expandedProducts: new Set(), visibleCount: 12 };
       const money = value => `${Number(value).toLocaleString("ru-RU")} ₸`;
       const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
       const categoryNames = { plastic: "Мёд в пластике", glass: "Мёд в стекле", other: "Дары пчёл" };
+      const materialNames = { plastic: "Пластик", glass: "Стекло", other: "Другое" };
       const toast = document.querySelector("#toast");
       let toastTimer;
       const statusNames = { new: "Новый", confirmed: "Подтверждён", paid: "Оплачен", shipped: "Отправлен", delivered: "Доставлен", cancelled: "Отменён" };
@@ -522,8 +539,14 @@
       window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => {
         if (!tg?.colorScheme) applyTheme();
       });
+      const packagingOf = product => product.container || product.category;
+      const productGroupKey = product => {
+        const nameKey = product.name.trim().replace(/\s+/g, " ").toLocaleLowerCase("ru");
+        const packaging = packagingOf(product);
+        return packaging === "plastic" || packaging === "glass" ? `honey:${nameKey}` : `${product.category}:${nameKey}`;
+      };
       function imageFor(product) {
-        const category = product.category;
+        const category = packagingOf(product);
         if (category === "other") {
           const emoji = /перга/i.test(product.name) ? "🌾" : /пыльца/i.test(product.name) ? "🌼" : /прополис/i.test(product.name) ? "🌿" : "🍯";
           return `<div class="art-extra" aria-hidden="true">${emoji}</div>`;
@@ -534,16 +557,15 @@
         const query = state.search.trim().toLocaleLowerCase("ru");
         const groups = new Map();
         state.products.forEach(product => {
-          const nameKey = product.name.trim().toLocaleLowerCase("ru");
-          const key = product.category === "plastic" || product.category === "glass" ? `honey:${nameKey}` : `${product.category}:${nameKey}`;
+          const key = productGroupKey(product);
           if (!groups.has(key)) groups.set(key, { key, name: product.name, variants: [] });
           groups.get(key).variants.push(product);
         });
         const products = [...groups.values()].map(group => {
-          const variants = group.variants.filter(product => state.filter === "all" || product.category === state.filter);
+          const variants = group.variants.filter(product => state.filter === "all" || packagingOf(product) === state.filter);
           return { ...group, variants, selected: variants.find(product => product.id === state.selectedVariants.get(group.key)) || variants[0] };
         }).filter(group => group.variants.length &&
-          `${group.name} ${group.variants.map(product => `${categoryNames[product.category] || ""} ${product.weight || ""} ${product.container || ""}`).join(" ")}`.toLocaleLowerCase("ru").includes(query)
+          `${group.name} ${group.variants.map(product => `${categoryNames[packagingOf(product)] || ""} ${product.weight || ""} ${product.container || ""}`).join(" ")}`.toLocaleLowerCase("ru").includes(query)
         );
         const root = document.querySelector("#products");
         if (!products.length) {
@@ -553,19 +575,38 @@
         }
         root.innerHTML = products.slice(0, state.visibleCount).map((group, index) => {
           const product = group.selected;
-          const variantOptions = group.variants.map(variant => `<option value="${variant.id}" ${variant.id === product.id ? "selected" : ""}>${escapeHtml(variant.container || categoryNames[variant.category] || "\u0424\u0430\u0441\u043e\u0432\u043a\u0430")} &middot; ${variant.weight ? `${Number(variant.weight).toLocaleString("ru-RU")} \u0433` : ""}</option>`).join("");
+          const packaging = packagingOf(product);
+          const isExpanded = state.expandedProducts.has(group.key);
+          const materials = [...new Set(group.variants.map(packagingOf))];
+          const materialOptions = materials.map(material => `<button type="button" class="variant-option ${material === packaging ? "active" : ""}" data-material="${escapeHtml(material)}" aria-pressed="${material === packaging}">${escapeHtml(materialNames[material] || material)}</button>`).join("");
+          const materialVariants = group.variants.filter(variant => packagingOf(variant) === packaging);
+          const weights = [...new Set(materialVariants.map(variant => variant.weight).filter(weight => weight != null))];
+          const weightOptions = weights.map(weight => {
+            return `<button type="button" class="variant-option ${Number(weight) === Number(product.weight) ? "active" : ""}" data-weight="${weight}" aria-pressed="${Number(weight) === Number(product.weight)}">${Number(weight).toLocaleString("ru-RU")} \u0433</button>`;
+          }).join("");
           return `
-          <article class="product-card" data-product-card="${product.id}">
-            <div class="product-art art-${escapeHtml(product.category)}">
-              <span class="product-badge">${index < 2 && state.filter === "all" ? "\u0412\u044b\u0431\u043e\u0440 \u043f\u0430\u0441\u0435\u043a\u0438" : escapeHtml(categoryNames[product.category] || "")}</span>
+          <article class="product-card ${isExpanded ? "expanded" : ""}" data-product-card="${product.id}" data-product-group="${escapeHtml(group.key)}" tabindex="0" aria-label="${escapeHtml(group.name)}" aria-expanded="${isExpanded}">
+            <div class="product-art art-${escapeHtml(packaging)}">
+              <span class="product-badge">${index < 2 && state.filter === "all" ? "\u0412\u044b\u0431\u043e\u0440 \u043f\u0430\u0441\u0435\u043a\u0438" : escapeHtml(categoryNames[packaging] || "")}</span>
               <button class="favorite ${state.favorites.has(product.id) ? "liked" : ""}" data-favorite="${product.id}" aria-label="\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435">${state.favorites.has(product.id) ? "&#9829;" : "&#9825;"}</button>
               ${imageFor(product)}
             </div>
             <div class="product-info">
-              <div class="product-category">${escapeHtml(categoryNames[product.category] || "")}</div>
-              <button class="product-name product-detail-trigger" data-product-detail="${product.id}" aria-label="\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0442\u043e\u0432\u0430\u0440\u0430 ${escapeHtml(product.name)}">${escapeHtml(product.name)}</button>
-              ${group.variants.length > 1 ? `<label class="sr-only" for="variant-${index}">\u0424\u0430\u0441\u043e\u0432\u043a\u0430 ${escapeHtml(group.name)}</label><select class="variant-select" id="variant-${index}" data-variant-group="${escapeHtml(group.key)}">${variantOptions}</select>` : `<div class="product-meta">${product.weight ? `${Number(product.weight).toLocaleString("ru-RU")} \u0433` : ""}${product.container ? ` &middot; ${escapeHtml(product.container)}` : ""}</div>`}
-              <div class="product-bottom"><span class="product-price">${money(product.price)}</span><button class="add-button" data-add="${product.id}" aria-label="\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c ${escapeHtml(product.name)} \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0443">+</button></div>
+              <div class="product-category">${escapeHtml(categoryNames[packaging] || "")}</div>
+              <h3 class="product-name">${escapeHtml(product.name)}</h3>
+              ${product.weight || product.container ? `<div class="product-meta">${product.weight ? `${Number(product.weight).toLocaleString("ru-RU")} \u0433` : ""}${product.container ? ` \u00b7 ${escapeHtml(categoryNames[product.container] || product.container)}` : ""}</div>` : ""}
+              <div class="product-bottom">
+                <span class="product-price">${money(product.price)}</span>
+                <div class="product-actions">
+                  <button type="button" class="product-expand" data-expand-product aria-expanded="${isExpanded}">${isExpanded ? "\u0421\u043a\u0440\u044b\u0442\u044c" : "\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435"}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg></button>
+                  <button class="add-button" data-add="${product.id}" aria-label="\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c ${escapeHtml(product.name)} \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0443">+</button>
+                </div>
+              </div>
+              <div class="product-details">
+                ${product.description ? `<p class="product-description">${escapeHtml(product.description)}</p>` : ""}
+                ${materials.length > 1 ? `<div class="variant-picker"><span class="variant-label">\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b</span><div class="variant-options" role="group" aria-label="\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b" data-variant-group="${escapeHtml(group.key)}">${materialOptions}</div></div>` : ""}
+                ${weights.length > 1 ? `<div class="variant-picker"><span class="variant-label">\u0412\u0435\u0441</span><div class="variant-options" role="group" aria-label="\u0412\u0435\u0441" data-variant-group="${escapeHtml(group.key)}">${weightOptions}</div></div>` : ""}
+              </div>
             </div>
           </article>`;
         }).join("");
@@ -578,6 +619,43 @@
         document.querySelector("#cart-count").textContent = count;
         document.querySelector("#mobile-cart-count").textContent = count;
         document.querySelector("#mobile-cart-button").setAttribute("aria-label", count ? `Открыть корзину, товаров: ${count}` : "Перейти к каталогу");
+      }
+      function browserCartSnapshot() {
+        return {
+          items: state.cart,
+          total: state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        };
+      }
+      function saveBrowserCart() {
+        localStorage.setItem(browserCartKey, JSON.stringify(
+          state.cart.map(item => ({ product_id: item.product_id, quantity: item.quantity }))
+        ));
+      }
+      function restoreBrowserCart() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(browserCartKey) || "[]");
+          if (!Array.isArray(saved)) throw new Error("Сохранённая корзина имеет неверный формат.");
+          const restored = [];
+          for (const item of saved) {
+            if (!Number.isInteger(item?.product_id) || !Number.isInteger(item?.quantity) || item.quantity < 1 || item.quantity > 99) {
+              throw new Error("Сохранённая корзина содержит некорректные товары.");
+            }
+            const product = state.products.find(entry => entry.id === item.product_id);
+            if (product) {
+              const existing = restored.find(entry => entry.product_id === product.id);
+              if (existing) existing.quantity = Math.min(99, existing.quantity + item.quantity);
+              else restored.push({ product_id: product.id, name: product.name, weight: product.weight, price: product.price, quantity: item.quantity });
+            }
+          }
+          state.cart = restored;
+          saveBrowserCart();
+          renderCart(browserCartSnapshot());
+          if (restored.length < saved.length) showToast("Некоторые товары из корзины больше недоступны и были удалены.");
+        } catch (error) {
+          state.cart = [];
+          renderCart(browserCartSnapshot());
+          showToast(`Не удалось восстановить корзину: ${error.message}`);
+        }
       }
       function renderCart(cart) {
         state.cart = cart.items || [];
@@ -596,22 +674,44 @@
         </div>`).join("");
       }
       async function refreshCart() {
-        if (!isTelegram) return;
+        if (!isTelegram) {
+          renderCart(browserCartSnapshot());
+          return;
+        }
         renderCart(await api("/api/cart"));
       }
       async function addProduct(productId) {
+        const product = state.products.find(item => item.id === productId);
+        if (!product) throw new Error("Товар больше недоступен.");
+        const existing = state.cart.find(item => item.product_id === productId);
         if (!isTelegram) {
-          showToast("Напишите нам в WhatsApp, чтобы оформить заказ.");
+          if (existing?.quantity >= 99) throw new Error("Максимальное количество товара в корзине — 99.");
+          const previousCart = state.cart;
+          state.cart = existing
+            ? state.cart.map(item => item.product_id === productId ? { ...item, quantity: item.quantity + 1 } : item)
+            : [...state.cart, { product_id: product.id, name: product.name, weight: product.weight, price: product.price, quantity: 1 }];
+          try { saveBrowserCart(); }
+          catch (error) { state.cart = previousCart; throw error; }
+          renderCart(browserCartSnapshot());
+          showToast(`${product.name} добавлен в корзину`);
           return;
         }
-        const product = state.products.find(item => item.id === productId);
-        const existing = state.cart.find(item => item.product_id === productId);
         await api("/api/cart", { method: "POST", body: JSON.stringify({ product_id: productId, quantity: (existing?.quantity || 0) + 1 }) });
         await refreshCart();
         showToast(`${product?.name || "Товар"} добавлен в корзину`);
         tg?.HapticFeedback?.notificationOccurred("success");
       }
       async function setQuantity(productId, quantity) {
+        if (!isTelegram) {
+          const previousCart = state.cart;
+          state.cart = quantity <= 0
+            ? state.cart.filter(item => item.product_id !== productId)
+            : state.cart.map(item => item.product_id === productId ? { ...item, quantity: Math.min(quantity, 99) } : item);
+          try { saveBrowserCart(); }
+          catch (error) { state.cart = previousCart; throw error; }
+          renderCart(browserCartSnapshot());
+          return;
+        }
         if (quantity <= 0) await api(`/api/cart/${productId}`, { method: "DELETE" });
         else await api("/api/cart", { method: "POST", body: JSON.stringify({ product_id: productId, quantity }) });
         await refreshCart();
@@ -620,6 +720,7 @@
         try {
           state.products = await api("/api/products");
           renderProducts();
+          if (!isTelegram) restoreBrowserCart();
         } catch (error) {
           document.querySelector("#products").innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
         }
@@ -627,12 +728,12 @@
       function openProduct(productId) {
         const product = state.products.find(item => item.id === productId);
         if (!product) return;
-        const categoryClass = product.category === "glass" ? "art-glass" : product.category === "other" ? "art-other" : "";
+        const categoryClass = `art-${packagingOf(product)}`;
         document.querySelector("#product-detail").innerHTML = `
           <button class="close-btn product-detail-close" data-close-product aria-label="Закрыть">×</button>
           <div class="product-detail-art ${categoryClass}">${imageFor(product)}</div>
           <div class="product-detail-copy">
-            <span class="eyebrow">${escapeHtml(categoryNames[product.category] || "Натуральный продукт")}</span>
+            <span class="eyebrow">${escapeHtml(categoryNames[packagingOf(product)] || "Натуральный продукт")}</span>
             <h2 id="product-detail-title">${escapeHtml(product.name)}</h2>
             <p>${escapeHtml(product.description || "Подробное описание этого продукта скоро появится. Уточнить детали можно в WhatsApp +7 701 034-00-20.")}</p>
             <div class="detail-meta">${product.weight ? `<span class="detail-chip">${Number(product.weight).toLocaleString("ru-RU")} г</span>` : ""}${product.container ? `<span class="detail-chip">${escapeHtml(product.container)}</span>` : ""}<span class="detail-chip">АпивитА · Казахстан</span></div>
@@ -712,37 +813,41 @@
         state.visibleCount = 12;
         renderProducts();
       });
-      document.querySelector("#products").addEventListener("change", event => {
-        const select = event.target.closest("[data-variant-group]");
-        if (!select) return;
-        const card = select.closest("[data-product-card]");
-        const product = state.products.find(item => item.id === Number(select.value));
-        if (!card || !product) return;
-        state.selectedVariants.set(select.dataset.variantGroup, product.id);
-        card.dataset.productCard = product.id;
-        card.querySelector("[data-product-detail]").dataset.productDetail = product.id;
-        card.querySelector("[data-add]").dataset.add = product.id;
-        card.querySelector("[data-favorite]").dataset.favorite = product.id;
-        card.querySelector(".product-price").textContent = money(product.price);
-        card.querySelector(".product-category").textContent = categoryNames[product.category] || "";
-        card.querySelector(".product-badge").textContent = categoryNames[product.category] || "";
-        const art = card.querySelector(".product-art");
-        art.classList.remove("art-plastic", "art-glass", "art-other");
-        art.classList.add(`art-${product.category}`);
-        const jar = art.querySelector(".jar");
-        if (jar) jar.classList.toggle("jar-glass", product.category === "glass");
-        const weightLabel = art.querySelector(".label small");
-        if (weightLabel) weightLabel.textContent = product.weight ? `${product.weight} \u0433` : "";
-        const favorite = card.querySelector("[data-favorite]");
-        favorite.classList.toggle("liked", state.favorites.has(product.id));
-        favorite.textContent = state.favorites.has(product.id) ? "\u2665" : "\u2661";
-      });
-      document.querySelector("#products").addEventListener("click", async event => {
-        const detailTrigger = event.target.closest("[data-product-detail]");
-        if (detailTrigger) {
-          openProduct(Number(detailTrigger.dataset.productDetail));
+      document.querySelector("#products").addEventListener("click", event => {
+        const materialOption = event.target.closest("[data-material]");
+        const weightOption = event.target.closest("[data-weight]");
+        const option = materialOption || weightOption;
+        if (option) {
+          const options = option.closest("[data-variant-group]");
+          const card = option.closest("[data-product-card]");
+          if (!options || !card) return;
+          const variants = state.products.filter(product => productGroupKey(product) === options.dataset.variantGroup);
+          const current = variants.find(product => product.id === Number(card.dataset.productCard));
+          const next = materialOption
+            ? variants.find(product => packagingOf(product) === materialOption.dataset.material && product.weight === current?.weight) ||
+              variants.find(product => packagingOf(product) === materialOption.dataset.material)
+            : variants.find(product => packagingOf(product) === packagingOf(current) && Number(product.weight) === Number(weightOption.dataset.weight));
+          if (!next) return;
+          state.selectedVariants.set(options.dataset.variantGroup, next.id);
+          renderProducts();
           return;
         }
+
+        const expand = event.target.closest("[data-expand-product]");
+        const card = event.target.closest("[data-product-card]");
+        if (expand && card) {
+          const key = card.dataset.productGroup;
+          state.expandedProducts.has(key) ? state.expandedProducts.delete(key) : state.expandedProducts.add(key);
+          renderProducts();
+          return;
+        }
+        if (card && !event.target.closest("button") && !event.target.closest(".product-details")) {
+          const key = card.dataset.productGroup;
+          state.expandedProducts.has(key) ? state.expandedProducts.delete(key) : state.expandedProducts.add(key);
+          renderProducts();
+        }
+      });
+      document.querySelector("#products").addEventListener("click", async event => {
         const favorite = event.target.closest("[data-favorite]");
         if (favorite) {
           const id = Number(favorite.dataset.favorite);
@@ -759,14 +864,14 @@
           finally { add.disabled = false; }
           return;
         }
-        const card = event.target.closest("[data-product-card]");
-        if (card && !event.target.closest("button")) openProduct(Number(card.dataset.productCard));
       });
       document.querySelector("#products").addEventListener("keydown", event => {
         const card = event.target.closest("[data-product-card]");
         if (card && (event.key === "Enter" || event.key === " ") && event.target === card) {
           event.preventDefault();
-          openProduct(Number(card.dataset.productCard));
+          const key = card.dataset.productGroup;
+          state.expandedProducts.has(key) ? state.expandedProducts.delete(key) : state.expandedProducts.add(key);
+          renderProducts();
         }
       });
       document.querySelector("#product-modal").addEventListener("click", async event => {
@@ -807,11 +912,6 @@
       document.querySelector("#drawer-backdrop").addEventListener("click", () => setDrawer(false));
       document.querySelector("#checkout-button").addEventListener("click", () => {
         if (!state.cart.length) { showToast("Добавьте в корзину что-нибудь вкусное"); return; }
-        if (!isTelegram) {
-          showToast("\u041d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u043d\u0430\u043c \u0432 WhatsApp, \u0447\u0442\u043e\u0431\u044b \u043e\u0444\u043e\u0440\u043c\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437.");
-          window.open("https://wa.me/77010340020", "_blank", "noopener");
-          return;
-        }
         setDrawer(false);
         setCheckout(true);
       });
@@ -821,14 +921,24 @@
       });
       document.querySelector("#checkout-form").addEventListener("submit", async event => {
         event.preventDefault();
-        const button = event.submitter;
+        const button = event.currentTarget.querySelector('[type="submit"]');
         button.disabled = true;
         try {
           const data = Object.fromEntries(new FormData(event.currentTarget));
-          const result = await api("/api/orders", { method: "POST", body: JSON.stringify(data) });
+          const endpoint = isTelegram ? "/api/orders" : "/api/guest/orders";
+          if (!isTelegram) data.items = state.cart.map(item => ({ product_id: item.product_id, quantity: item.quantity }));
+          const result = await api(endpoint, { method: "POST", body: JSON.stringify(data) });
           setCheckout(false);
+          let cartClearError = null;
+          if (!isTelegram) {
+            state.cart = [];
+            try { saveBrowserCart(); }
+            catch (error) { cartClearError = error; }
+          }
           renderCart({ items: [], total: 0 });
-          showToast(`Заказ №${result.order_id} принят. Скоро свяжемся с вами!`);
+          showToast(cartClearError
+            ? `Заказ №${result.order_id} принят, но корзину браузера не удалось очистить: ${cartClearError.message}`
+            : `Заказ №${result.order_id} принят. Скоро свяжемся с вами!`);
           event.currentTarget.reset();
           tg?.HapticFeedback?.notificationOccurred("success");
         } catch (error) {

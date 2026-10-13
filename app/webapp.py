@@ -95,6 +95,23 @@ async def _get_user(session, telegram_user: dict) -> User:
     return user
 
 
+def _checkout_details(data: dict) -> tuple[str, str, str, str]:
+    if not isinstance(data, dict):
+        raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
+    city, address, phone, comment = (
+        data.get("city", ""),
+        data.get("address", ""),
+        data.get("phone", ""),
+        data.get("comment", ""),
+    )
+    if not all(isinstance(value, str) for value in (city, address, phone, comment)):
+        raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
+    city, address, phone, comment = (value.strip() for value in (city, address, phone, comment))
+    if not city or not address or not phone or len(city) > 255 or len(address) > 2000 or len(comment) > 2000 or len(phone) > 32:
+        raise HTTPException(status_code=400, detail="Заполните город, адрес и телефон.")
+    return city, address, phone, comment
+
+
 @app.get("/api/cart")
 async def get_cart(telegram_user: dict = Depends(_telegram_user_dependency)):
     async with get_session() as session:
@@ -178,12 +195,9 @@ async def get_orders(telegram_user: dict = Depends(_telegram_user_dependency)):
 async def create_order(request: Request, telegram_user: dict = Depends(_telegram_user_dependency)):
     try:
         data = await request.json()
-        city, address, phone = (str(data.get(key, "")).strip() for key in ("city", "address", "phone"))
-        comment = str(data.get("comment", "")).strip()
     except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
-    if not city or not address or not phone or len(city) > 255 or len(address) > 2000 or len(comment) > 2000 or len(phone) > 32:
-        raise HTTPException(status_code=400, detail="Заполните город, адрес и телефон.")
+    city, address, phone, comment = _checkout_details(data)
     notification_items = []
     async with get_session() as session:
         user = await _get_user(session, telegram_user)
@@ -228,6 +242,97 @@ async def create_order(request: Request, telegram_user: dict = Depends(_telegram
     from app.services.notifications import notify_admin_new_order
 
     await notify_admin_new_order(bot, notification_order, notification_user, notification_items)
+    return {"ok": True, "order_id": order_id}
+
+
+@app.post("/api/guest/orders")
+async def create_guest_order(request: Request):
+    try:
+        data = await request.json()
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
+    if not isinstance(data, dict):
+        raise HTTPException(status_code=400, detail="Некорректные данные заказа.")
+    city, address, phone, comment = _checkout_details(data)
+    requested_items = data.get("items")
+    if not isinstance(requested_items, list) or not requested_items or len(requested_items) > 50:
+        raise HTTPException(status_code=400, detail="Корзина пуста или содержит слишком много товаров.")
+
+    quantities: dict[int, int] = {}
+    for item in requested_items:
+        if not isinstance(item, dict):
+            raise HTTPException(status_code=400, detail="Некорректный товар в корзине.")
+        product_id, quantity = item.get("product_id"), item.get("quantity")
+        if (
+            not isinstance(product_id, int) or isinstance(product_id, bool) or product_id <= 0
+            or not isinstance(quantity, int) or isinstance(quantity, bool) or not 1 <= quantity <= 99
+        ):
+            raise HTTPException(status_code=400, detail="Некорректный товар или количество.")
+        quantities[product_id] = quantities.get(product_id, 0) + quantity
+        if quantities[product_id] > 99:
+            raise HTTPException(status_code=400, detail="Количество товара не может превышать 99.")
+
+    notification_items = []
+    async with get_session() as session:
+        result = await session.execute(
+            select(Product).where(
+                Product.id.in_(quantities),
+                Product.is_active.is_(True),
+            )
+        )
+        products_by_id = {product.id: product for product in result.scalars()}
+        if len(products_by_id) != len(quantities):
+            raise HTTPException(status_code=400, detail="Корзина содержит недоступный товар.")
+
+        total = sum(
+            (product.price * quantities[product_id] for product_id, product in products_by_id.items()),
+            start=0,
+        )
+        order = Order(
+            user_id=None,
+            guest_phone=phone,
+            total_price=total,
+            delivery_type="delivery_kz",
+            city=city,
+            address=address,
+            comment=comment,
+            status=OrderStatus.new,
+        )
+        session.add(order)
+        await session.flush()
+        for product_id, quantity in quantities.items():
+            product = products_by_id[product_id]
+            notification_items.append({
+                "name": product.name,
+                "price": product.price,
+                "quantity": quantity,
+            })
+            session.add(OrderItem(
+                order_id=order.id,
+                product_id=product.id,
+                product_name=product.name,
+                quantity=quantity,
+                price_per_unit=product.price,
+            ))
+        order_id = order.id
+        notification_order = SimpleNamespace(
+            id=order.id,
+            total_price=order.total_price,
+            city=order.city,
+            address=order.address,
+            comment=order.comment,
+            created_at=order.created_at,
+            status=order.status,
+        )
+
+    from app.services.notifications import notify_admin_new_order
+
+    await notify_admin_new_order(
+        bot,
+        notification_order,
+        SimpleNamespace(username=None, full_name="Клиент с сайта", phone=phone),
+        notification_items,
+    )
     return {"ok": True, "order_id": order_id}
 
 

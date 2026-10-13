@@ -105,9 +105,10 @@ CREATE INDEX IF NOT EXISTS idx_carts_user_id ON carts (user_id);
 
 CREATE TABLE IF NOT EXISTS orders (
     id          SERIAL          PRIMARY KEY,
-    user_id     INTEGER         NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+    user_id     INTEGER         REFERENCES users (id) ON DELETE RESTRICT,
     status      order_status    NOT NULL DEFAULT 'new',
     total_price INTEGER         NOT NULL DEFAULT 0,     -- tenge
+    guest_phone VARCHAR(32),
     city        VARCHAR(128)    NOT NULL,
     address     TEXT,
     note        TEXT,

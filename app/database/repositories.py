@@ -433,8 +433,8 @@ class OrderRepository:
                 "subtotal": int(i.price_per_unit * i.quantity),
             })
 
-        user_name = order.user.full_name if order.user else "Клиент"
-        user_phone = order.user.phone if order.user else ""
+        user_name = order.user.full_name if order.user else "Клиент с сайта"
+        user_phone = order.user.phone if order.user else (order.guest_phone or "")
         user_username = order.user.username if order.user else ""
         user_tg_id = order.user.telegram_id if order.user else None
 
