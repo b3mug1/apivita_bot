@@ -140,6 +140,7 @@ python main.py
 
 ```bash
 psql "$DATABASE_URL" -f migrations/20261013_guest_web_orders.sql
+psql "$DATABASE_URL" -f migrations/20261014_align_order_schema.sql
 ```
 
 ### Для пользователей:
