@@ -101,7 +101,7 @@ class Order(Base):
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     guest_phone: Mapped[str | None] = mapped_column(String(32), nullable=True)
     status: Mapped[OrderStatus] = mapped_column(
-        Enum(OrderStatus), nullable=False, default=OrderStatus.new
+        Enum(OrderStatus, name="order_status"), nullable=False, default=OrderStatus.new
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

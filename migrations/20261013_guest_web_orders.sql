@@ -6,6 +6,16 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_type VARCHAR(128);
 DO $$
 BEGIN
     IF EXISTS (
+        SELECT 1 FROM pg_type
+        WHERE typname = 'orderstatus'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM pg_type
+        WHERE typname = 'order_status'
+    ) THEN
+        ALTER TYPE orderstatus RENAME TO order_status;
+    END IF;
+
+    IF EXISTS (
         SELECT 1 FROM information_schema.columns
         WHERE table_name = 'orders' AND column_name = 'note'
     ) AND NOT EXISTS (
