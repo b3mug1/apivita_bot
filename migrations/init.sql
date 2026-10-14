@@ -109,9 +109,10 @@ CREATE TABLE IF NOT EXISTS orders (
     status      order_status    NOT NULL DEFAULT 'new',
     total_price INTEGER         NOT NULL DEFAULT 0,     -- tenge
     guest_phone VARCHAR(32),
+    delivery_type VARCHAR(128),
     city        VARCHAR(128)    NOT NULL,
     address     TEXT,
-    note        TEXT,
+    comment     TEXT,
     created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
@@ -130,9 +131,8 @@ CREATE TABLE IF NOT EXISTS order_items (
     order_id      INTEGER     NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
     product_id    INTEGER     REFERENCES products (id) ON DELETE SET NULL,
     product_name  VARCHAR(255) NOT NULL,               -- snapshot at order time
-    unit_price    INTEGER      NOT NULL,
-    quantity      INTEGER      NOT NULL DEFAULT 1 CHECK (quantity > 0),
-    subtotal      INTEGER      NOT NULL                 -- unit_price * quantity
+    price_per_unit INTEGER     NOT NULL,
+    quantity      INTEGER      NOT NULL DEFAULT 1 CHECK (quantity > 0)
 );
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);

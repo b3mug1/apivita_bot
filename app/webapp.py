@@ -11,6 +11,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import Update
 from fastapi import Depends, FastAPI, HTTPException, Request
+from loguru import logger
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -273,57 +274,63 @@ async def create_guest_order(request: Request):
             raise HTTPException(status_code=400, detail="Количество товара не может превышать 99.")
 
     notification_items = []
-    async with get_session() as session:
-        result = await session.execute(
-            select(Product).where(
-                Product.id.in_(quantities),
-                Product.is_active.is_(True),
+    try:
+        async with get_session() as session:
+            result = await session.execute(
+                select(Product).where(
+                    Product.id.in_(quantities),
+                    Product.is_active.is_(True),
+                )
             )
-        )
-        products_by_id = {product.id: product for product in result.scalars()}
-        if len(products_by_id) != len(quantities):
-            raise HTTPException(status_code=400, detail="Корзина содержит недоступный товар.")
+            products_by_id = {product.id: product for product in result.scalars()}
+            if len(products_by_id) != len(quantities):
+                raise HTTPException(status_code=400, detail="Корзина содержит недоступный товар.")
 
-        total = sum(
-            (product.price * quantities[product_id] for product_id, product in products_by_id.items()),
-            start=0,
-        )
-        order = Order(
-            user_id=None,
-            guest_phone=phone,
-            total_price=total,
-            delivery_type="delivery_kz",
-            city=city,
-            address=address,
-            comment=comment,
-            status=OrderStatus.new,
-        )
-        session.add(order)
-        await session.flush()
-        for product_id, quantity in quantities.items():
-            product = products_by_id[product_id]
-            notification_items.append({
-                "name": product.name,
-                "price": product.price,
-                "quantity": quantity,
-            })
-            session.add(OrderItem(
-                order_id=order.id,
-                product_id=product.id,
-                product_name=product.name,
-                quantity=quantity,
-                price_per_unit=product.price,
-            ))
-        order_id = order.id
-        notification_order = SimpleNamespace(
-            id=order.id,
-            total_price=order.total_price,
-            city=order.city,
-            address=order.address,
-            comment=order.comment,
-            created_at=order.created_at,
-            status=order.status,
-        )
+            total = sum(
+                (product.price * quantities[product_id] for product_id, product in products_by_id.items()),
+                start=0,
+            )
+            order = Order(
+                user_id=None,
+                guest_phone=phone,
+                total_price=total,
+                delivery_type="delivery_kz",
+                city=city,
+                address=address,
+                comment=comment,
+                status=OrderStatus.new,
+            )
+            session.add(order)
+            await session.flush()
+            for product_id, quantity in quantities.items():
+                product = products_by_id[product_id]
+                notification_items.append({
+                    "name": product.name,
+                    "price": product.price,
+                    "quantity": quantity,
+                })
+                session.add(OrderItem(
+                    order_id=order.id,
+                    product_id=product.id,
+                    product_name=product.name,
+                    quantity=quantity,
+                    price_per_unit=product.price,
+                ))
+            order_id = order.id
+            notification_order = SimpleNamespace(
+                id=order.id,
+                total_price=order.total_price,
+                city=order.city,
+                address=order.address,
+                comment=order.comment,
+                created_at=order.created_at,
+                status=order.status,
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("Failed to create guest website order")
+        raise HTTPException(status_code=500, detail="Не удалось сохранить заказ. Сообщите продавцу и попробуйте позже.")
 
     from app.services.notifications import notify_admin_new_order
 
