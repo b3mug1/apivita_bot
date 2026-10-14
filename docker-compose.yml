@@ -20,6 +20,8 @@ services:
   bot:
     build: .
     container_name: apivita_bot
+    profiles:
+      - polling
     restart: unless-stopped
     depends_on:
       db:

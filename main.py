@@ -58,15 +58,21 @@ async def main() -> None:
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     logger.info("Starting Apivita Bot...")
     
-    # Initialize database
-    await init_db()
-    logger.info("Database initialized successfully")
-    
     # Initialize Bot
     bot = Bot(
         token=settings.BOT_TOKEN,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
+
+    webhook_info = await bot.get_webhook_info()
+    if webhook_info.url:
+        logger.warning("Webhook is active at {}. Local polling will not start.", webhook_info.url)
+        await bot.session.close()
+        return
+
+    # Initialize database only for local polling.
+    await init_db()
+    logger.info("Database initialized successfully")
     
     # Initialize Dispatcher with FSM storage
     storage = MemoryStorage()
@@ -91,7 +97,6 @@ async def main() -> None:
     await set_bot_commands(bot)
 
     # Start polling
-    await bot.delete_webhook(drop_pending_updates=True)
     logger.info("Bot is running. Press Ctrl+C to stop.")
     try:
         await dp.start_polling(

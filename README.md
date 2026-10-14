@@ -130,7 +130,7 @@ python main.py
 
 Для Vercel нужны внешние PostgreSQL и Redis, так как функции Vercel не хранят локальное состояние между запросами. В настройках проекта задайте `BOT_TOKEN`, `ADMIN_IDS`, `DATABASE_URL` (с пулером подключений, если доступен), `REDIS_URL`, `WEBHOOK_SECRET` и `WEBAPP_URL` (домен проекта Vercel); также задайте `VERCEL=1`. Redis используется для FSM-состояний webhook-бота. Приложение автоматически определяется Vercel по `index.py`; перед публикацией достаточно импортировать репозиторий в Vercel либо выполнить `vercel` (CLI версии 48.1.8 или новее).
 
-После деплоя настройте webhook и кнопку Mini App командой `python scripts/configure_telegram.py`, запущенной с этими переменными окружения. В BotFather выполните `/setdomain` и укажите домен Vercel. Mini App будет открываться кнопкой «Магазин» в меню бота. Не запускайте одновременно `python main.py` и webhook для одного бота: локальный polling и production webhook взаимоисключающие.
+После деплоя настройте webhook и кнопку Mini App командой `python scripts/configure_telegram.py`, запущенной с этими переменными окружения. В BotFather выполните `/setdomain` и укажите домен Vercel. Mini App будет открываться кнопкой «Магазин» в меню бота. Контейнер бота в Docker Compose запускается только с профилем `polling` (`docker compose --profile polling up`). Пока настроен production webhook, локальный polling не запускается; для перехода на локальный режим сначала отключите webhook вручную.
 
 ### Заказы с сайта
 
