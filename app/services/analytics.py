@@ -10,6 +10,7 @@ from loguru import logger
 
 from app.database.repositories import AnalyticsRepository
 from app.database.models import Analytics, User, Order, OrderStatus
+from app.utils.timezone import SHOP_TIMEZONE
 
 
 async def log_action(session, user_id: int, action: str, data: Optional[dict] = None) -> None:
@@ -33,9 +34,10 @@ async def get_stats(session) -> dict:
         - new_orders_today: number of new orders today
         - top_actions: most logged actions
     """
-    now = datetime.now(tz=timezone.utc)
-    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    week_start = today_start - timedelta(days=7)
+    now_local = datetime.now(tz=timezone.utc).astimezone(SHOP_TIMEZONE)
+    today_start_local = now_local.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = today_start_local.astimezone(timezone.utc)
+    week_start = (today_start_local - timedelta(days=7)).astimezone(timezone.utc)
 
     try:
         # Total users

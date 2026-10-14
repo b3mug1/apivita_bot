@@ -13,6 +13,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.config import settings
 from app.database.repositories import OrderRepository, UserRepository, AnalyticsRepository
 from app.database.connection import get_session
+from app.utils.timezone import format_local_datetime
 from locales.ru.messages import MESSAGES
 
 router = Router(name="admin")
@@ -140,7 +141,7 @@ async def cb_admin_orders(call: CallbackQuery) -> None:
     builder = InlineKeyboardBuilder()
     for order in orders:
         status_emoji = _status_emoji(order.status)
-        label = f"{status_emoji} #{order.id} — {order.total_price} тг ({order.created_at.strftime('%d.%m %H:%M')})"
+        label = f"{status_emoji} #{order.id} — {order.total_price} тг ({format_local_datetime(order.created_at, '%d.%m %H:%M')})"
         builder.button(text=label, callback_data=f"admin_order:{order.id}")
     builder.button(text="⬅️ Главное меню", callback_data="admin_main")
     builder.adjust(1)
@@ -195,7 +196,7 @@ def _format_admin_order_text(order) -> str:
     return (
         f"📦 <b>Заказ #{order.id}</b>\n"
         f"Статус: {_status_emoji(order.status)} <b>{order.status}</b>\n"
-        f"Дата: {order.created_at.strftime('%d.%m.%Y %H:%M')}\n\n"
+        f"Дата: {format_local_datetime(order.created_at)}\n\n"
         f"👤 Пользователь: {user_display}"
         f"{phone_line}\n"
         f"🏙 Город: {order.city}\n"

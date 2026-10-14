@@ -11,6 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.database.repositories import OrderRepository
 from app.database.connection import get_session
+from app.utils.timezone import format_local_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +47,7 @@ def _status_display(status: str) -> str:
 
 
 def _format_date(dt: datetime | str | None) -> str:
-    if dt is None:
-        return "—"
-    if isinstance(dt, str):
-        try:
-            dt = datetime.fromisoformat(dt)
-        except ValueError:
-            return dt
-    return dt.strftime("%d.%m.%Y %H:%M")
+    return format_local_datetime(dt)
 
 
 # ---------------------------------------------------------------------------

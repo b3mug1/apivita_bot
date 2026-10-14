@@ -5,6 +5,8 @@ from datetime import datetime
 from html import escape
 from typing import Optional
 
+from app.utils.timezone import format_local_datetime
+
 
 def format_price(price: int) -> str:
     """Format price as '3 500 тг'."""
@@ -52,7 +54,7 @@ def format_order_summary(order, items: list) -> str:
     """Return full order summary text with HTML formatting."""
     lines = [
         f"📦 <b>Заказ №<code>{order.id}</code></b>",
-        f"📅 {order.created_at.strftime('%d.%m.%Y %H:%M')}",
+        f"📅 {format_local_datetime(order.created_at)}",
         f"Статус: {format_order_status(order.status.value if hasattr(order.status, 'value') else order.status)}",
         "",
         "<b>Состав заказа:</b>",
@@ -115,4 +117,4 @@ def truncate_text(text: str, max_len: int = 100) -> str:
 
 def format_datetime(dt: datetime) -> str:
     """Format datetime as 'dd.mm.yyyy hh:mm'."""
-    return dt.strftime("%d.%m.%Y %H:%M")
+    return format_local_datetime(dt)
